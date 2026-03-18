@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+  --primary-bg: #0d1117;
+  --panel-bg: rgba(22, 27, 34, 0.6);
+  --text-primary: #c9d1d9;
+  --text-highlight: #58a6ff;
+  --border-glow: rgba(88, 166, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent: #bc8cff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--primary-bg);
+  background-image: radial-gradient(circle at 15% 50%, rgba(88, 166, 255, 0.08), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(188, 140, 255, 0.08), transparent 25%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-panel:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px 0 var(--border-glow);
+}
+
+h1 {
+  font-weight: 800;
+  font-size: 2.5rem;
+  background: linear-gradient(to right, var(--text-highlight), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+}
+
+button {
+  background: transparent;
+  border: 1px solid var(--text-highlight);
+  color: var(--text-highlight);
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 20px;
+}
+
+button:hover {
+  background: var(--text-highlight);
+  color: #fff;
+  box-shadow: 0 0 15px var(--border-glow);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: white;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--text-highlight);
+  box-shadow: 0 0 8px var(--border-glow);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite ease-in-out;
+}
