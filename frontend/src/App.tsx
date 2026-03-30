@@ -24,7 +24,7 @@ function Dashboard({ user, onLogout }: { user: UserData; onLogout: () => void })
       </header>
 
       <main>
-        <h1 style={{ textAlign: 'left', marginBottom: '40px' }}>Welcome back.</h1>
+        <h1 style={{ textAlign: 'left', marginBottom: '40px' }}>Welcome back, {user.role}.</h1>
         
         <div className="grid-layout">
           {dummyExams.map(exam => (
@@ -45,6 +45,29 @@ function Dashboard({ user, onLogout }: { user: UserData; onLogout: () => void })
             </div>
           ))}
         </div>
+
+        {user.role === 'Admin' && (
+          <div className="admin-panel animate-in">
+            <h2 style={{ textAlign: 'left' }}>Administrative Tools</h2>
+            <div className="admin-grid">
+              <div className="glass-panel card">
+                <h3>Exam Hub</h3>
+                <p style={{ fontSize: '0.85rem' }}>Create, schedule, and finalize assessments across all courses.</p>
+                <button className="admin-btn">Create New Exam</button>
+              </div>
+              <div className="glass-panel card">
+                <h3>Member Control</h3>
+                <p style={{ fontSize: '0.85rem' }}>Manage examiner assignments and verify student enrollments.</p>
+                <button className="admin-btn">Manage Users</button>
+              </div>
+              <div className="glass-panel card">
+                <h3>Global Audit</h3>
+                <p style={{ fontSize: '0.85rem' }}>Real-time analytics on platform usage and grade distributions.</p>
+                <button className="admin-btn">Generate Reports</button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
@@ -55,6 +78,7 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [role, setRole] = useState('Student');
   const [message, setMessage] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
@@ -79,7 +103,7 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const endpoint = isLogin ? 'login' : 'register';
-    const body = isLogin ? { email, password } : { email, password, role: 'Student' };
+    const body = isLogin ? { email, password } : { email, password, fullName, role };
 
     try {
       const response = await fetch(`http://localhost:4000/api/auth/${endpoint}`, {
@@ -148,6 +172,14 @@ function App() {
             onChange={(e) => setPassword(e.target.value)} 
             required 
           />
+
+          {!isLogin && (
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="Student">Student Access</option>
+              <option value="Examiner">Examiner Workspace</option>
+              <option value="Admin">System Administrator</option>
+            </select>
+          )}
           
           <button type="submit">
             {isLogin ? 'Authenticate' : 'Register Now'}

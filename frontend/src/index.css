@@ -145,10 +145,48 @@ input {
   box-sizing: border-box;
 }
 
-input:focus {
+input:focus, select:focus {
   outline: none;
   border-color: var(--text-highlight);
   box-shadow: 0 0 8px var(--border-glow);
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: white;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.admin-panel {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px dashed var(--glass-border);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.admin-btn {
+  background: rgba(188, 140, 255, 0.1);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.admin-btn:hover {
+  background: var(--accent);
+  box-shadow: 0 0 15px rgba(188, 140, 255, 0.4);
 }
 
 @keyframes pulse {
