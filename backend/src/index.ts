@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import 'dotenv/config';
 import authRoutes from './routes/authRoutes';
+import examRoutes from './routes/examRoutes';
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/exams', examRoutes);
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => {

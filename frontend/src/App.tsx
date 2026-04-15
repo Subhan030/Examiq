@@ -4,13 +4,14 @@ import './index.css'
 interface UserData {
   email: string;
   role: string;
+  id?: string;
 }
 
 interface Exam {
-  id: number;
+  _id: string;
   title: string;
-  duration: string;
-  status: 'Active' | 'Upcoming' | 'Closed';
+  duration: number;
+  state: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'CLOSED';
 }
 
 function App() {
@@ -24,14 +25,10 @@ function App() {
   const [user, setUser] = useState<UserData | null>(null);
 
   // New Interactive State
-  const [exams, setExams] = useState<Exam[]>([
-    { id: 1, title: "Mid-term UI/UX Design", duration: "60 mins", status: "Active" },
-    { id: 2, title: "Backend Systems Architecture", duration: "90 mins", status: "Upcoming" },
-    { id: 3, title: "Advanced Mathematics III", duration: "45 mins", status: "Closed" },
-  ]);
+  const [exams, setExams] = useState<Exam[]>([]);
   const [toasts, setToasts] = useState<{ id: number; msg: string }[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newExam, setNewExam] = useState({ title: '', duration: '60 mins', status: 'Active' as const });
+  const [newExam, setNewExam] = useState({ title: '', duration: 60, state: 'DRAFT' as const });
 
   const addToast = (msg: string) => {
     const id = Date.now();
@@ -47,8 +44,23 @@ function App() {
     if (token && storedUser) {
       setIsLoggedIn(true);
       setUser(JSON.parse(storedUser));
+      fetchExams(token);
     }
   }, []);
+
+  const fetchExams = async (token: string) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/exams', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setExams(data);
+      }
+    } catch (err) {
+      addToast("Failed to fetch live exam data.");
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -59,13 +71,34 @@ function App() {
     addToast("Session ended successfully.");
   };
 
-  const handleCreateExam = (e: React.FormEvent) => {
+  const handleCreateExam = async (e: React.FormEvent) => {
     e.preventDefault();
-    const id = exams.length + 1;
-    setExams(prev => [...prev, { id, ...newExam }]);
-    setIsModalOpen(false);
-    setNewExam({ title: '', duration: '60 mins', status: 'Active' });
-    addToast(`Exam "${newExam.title}" deployed successfully!`);
+    const token = localStorage.getItem('token');
+    // Simplified: Using a hardcoded courseId for demonstration
+    // In a full app, you'd pick a course from a dropdown
+    const courseId = "60eaf2960eaf2960eaf2960e"; 
+    
+    try {
+      const response = await fetch('http://localhost:4000/api/exams', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ ...newExam, courseId, totalMarks: 100 })
+      });
+
+      if (response.ok) {
+        const created = await response.json();
+        setExams(prev => [...prev, created]);
+        setIsModalOpen(false);
+        addToast(`Exam "${newExam.title}" deployed!`);
+      } else {
+        addToast("Authorization failed for this action.");
+      }
+    } catch (err) {
+      addToast("Network error during deployment.");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,6 +121,7 @@ function App() {
           localStorage.setItem('user', JSON.stringify(userData));
           setUser(userData);
           setIsLoggedIn(true);
+          fetchExams(data.token);
         } else {
           setMessage('Account created! Please login.');
           setIsLogin(true);
@@ -122,19 +156,13 @@ function App() {
             onChange={e => setNewExam({...newExam, title: e.target.value})} 
             required 
           />
-          <label style={{ fontSize: '0.8rem', opacity: 0.7 }}>Duration</label>
-          <select value={newExam.duration} onChange={e => setNewExam({...newExam, duration: e.target.value})}>
-            <option>30 mins</option>
-            <option>45 mins</option>
-            <option>60 mins</option>
-            <option>90 mins</option>
-            <option>120 mins</option>
-          </select>
-          <label style={{ fontSize: '0.8rem', opacity: 0.7 }}>Status</label>
-          <select value={newExam.status} onChange={e => setNewExam({...newExam, status: e.target.value as any})}>
-            <option value="Active">Active (Launch Immediately)</option>
-            <option value="Upcoming">Upcoming (Scheduled)</option>
-          </select>
+          <label style={{ fontSize: '0.8rem', opacity: 0.7 }}>Duration (min)</label>
+          <input 
+            type="number" 
+            value={newExam.duration} 
+            onChange={e => setNewExam({...newExam, duration: parseInt(e.target.value)})} 
+            required 
+          />
           <button type="submit" style={{ marginTop: '30px' }}>Deploy to Portal</button>
           <button type="button" onClick={() => setIsModalOpen(false)} style={{ border: 'none', background: 'transparent', opacity: 0.5, marginTop: '10px' }}>Cancel</button>
         </form>
@@ -160,20 +188,21 @@ function App() {
           <h1 style={{ textAlign: 'left', marginBottom: '40px' }}>Welcome back, {user.role}.</h1>
           
           <div className="grid-layout">
+            {exams.length === 0 && <p style={{ opacity: 0.5 }}>No assessments assigned to your account yet.</p>}
             {exams.map(exam => (
-              <div key={exam.id} className="glass-panel card">
-                <div className="badge">{exam.status}</div>
+              <div key={exam._id} className="glass-panel card">
+                <div className="badge">{exam.state}</div>
                 <h3 style={{ marginTop: '15px' }}>{exam.title}</h3>
-                <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Assessment period for this module is currently {exam.status.toLowerCase()}.</p>
+                <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Assessment duration: {exam.duration} minutes.</p>
                 
                 <div className="card-footer">
-                  <span>Time: {exam.duration}</span>
+                  <span>Status: {exam.state}</span>
                   <button 
                     style={{ width: 'auto', marginTop: 0, padding: '8px 16px', borderRadius: '6px' }}
-                    disabled={exam.status !== 'Active'}
-                    onClick={() => addToast(`Initializing secure environment for "${exam.title}"...`)}
+                    disabled={exam.state !== 'ACTIVE'}
+                    onClick={() => addToast(`Starting session for "${exam.title}"...`)}
                   >
-                    {exam.status === 'Active' ? 'Start Exam' : 'View Details'}
+                    {exam.state === 'ACTIVE' ? 'Start Exam' : 'Preview'}
                   </button>
                 </div>
               </div>
@@ -192,12 +221,12 @@ function App() {
                 <div className="glass-panel card">
                   <h3>Member Control</h3>
                   <p style={{ fontSize: '0.85rem' }}>Manage examiner assignments and verify student enrollments.</p>
-                  <button className="admin-btn" onClick={() => addToast("User management system is initializing...")}>Manage Users</button>
+                  <button className="admin-btn" onClick={() => addToast("User management online.")}>Manage Users</button>
                 </div>
                 <div className="glass-panel card">
                   <h3>Global Audit</h3>
                   <p style={{ fontSize: '0.85rem' }}>Real-time analytics on platform usage and grade distributions.</p>
-                  <button className="admin-btn" onClick={() => addToast("Aggregating system reports...")}>Generate Reports</button>
+                  <button className="admin-btn" onClick={() => addToast("Fetching platform audits...")}>Generate Reports</button>
                 </div>
               </div>
             </div>
