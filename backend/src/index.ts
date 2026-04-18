@@ -1,33 +1,50 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import cors from 'cors';
+import 'dotenv/config';
 import authRoutes from './routes/authRoutes';
 
-dotenv.config();
-
 const app = express();
+
+// Standard Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Main App Routing
+// Routes
 app.use('/api/auth', authRoutes);
 
-// Health check
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', time: new Date() });
+// Health Check
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ 
+    status: 'online', 
+    timestamp: new Date().toISOString(),
+    db_status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
 });
 
-// Setup Server
+// Error Handling Middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('Unhandled Error:', err);
+  res.status(500).json({ message: 'Internal Server Error', error: err.message });
+});
+
 const PORT = process.env.PORT || 4000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/examiq';
 
 if (process.env.NODE_ENV !== 'test') {
-  mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/examiq').then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  }).catch((err) => {
-    console.error('Mongo connection error:', err);
-  });
+  console.log(`Connecting to MongoDB at ${MONGO_URI}...`);
+  mongoose.connect(MONGO_URI)
+    .then(() => {
+      console.log('Successfully connected to MongoDB');
+      app.listen(PORT, () => {
+        console.log(`Examiq Backend running on http://localhost:${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('CRITICAL: MongoDB connection failed!');
+      console.error(err);
+    });
 }
 
 export default app;
