@@ -7,7 +7,11 @@ export interface IExam extends Document {
   courseId: mongoose.Types.ObjectId;
   duration: number; // in minutes
   totalMarks: number;
+  startTime?: Date;
+  endTime?: Date;
   state: ExamState;
+  isPractice: boolean;
+  randomizeCount: number;
   questions: mongoose.Types.ObjectId[];
   publish(): Promise<void>;
   activate(): Promise<void>;
@@ -19,11 +23,15 @@ const ExamSchema: Schema = new Schema({
   courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
   duration: { type: Number, required: true },
   totalMarks: { type: Number, required: true },
+  startTime: { type: Date },
+  endTime: { type: Date },
   state: { 
     type: String, 
     enum: ['DRAFT', 'PUBLISHED', 'ACTIVE', 'CLOSED'], 
     default: 'DRAFT' 
   },
+  isPractice: { type: Boolean, default: false },
+  randomizeCount: { type: Number, default: 0 },
   questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }]
 }, { timestamps: true });
 

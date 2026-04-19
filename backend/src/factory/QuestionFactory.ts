@@ -39,10 +39,25 @@ export class SubjectiveQuestion extends Question {
   }
 }
 
+export class TFQuestion extends Question {
+  private correctAnswer: boolean;
+
+  constructor(content: string, difficulty: string, correctAnswer: boolean) {
+    super(content, difficulty);
+    this.correctAnswer = correctAnswer;
+  }
+
+  validateAnswer(answer: any): boolean {
+    return answer === this.correctAnswer;
+  }
+}
+
 export class QuestionFactory {
-  static createQuestion(type: 'MCQ' | 'Subjective', config: any): Question {
+  static createQuestion(type: 'MCQ' | 'TF' | 'Subjective', config: any): Question {
     if (type === 'MCQ') {
       return new MCQQuestion(config.content, config.difficulty, config.options, config.correctOptionIndex);
+    } else if (type === 'TF') {
+      return new TFQuestion(config.content, config.difficulty, config.correctAnswer);
     } else if (type === 'Subjective') {
       return new SubjectiveQuestion(config.content, config.difficulty, config.expectedKeywords);
     }

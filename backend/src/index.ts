@@ -4,6 +4,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import authRoutes from './routes/authRoutes';
 import examRoutes from './routes/examRoutes';
+import courseRoutes from './routes/courseRoutes';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/exams', examRoutes);
+app.use('/api/courses', courseRoutes);
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => {
@@ -36,17 +38,20 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/examiq';
 
 if (process.env.NODE_ENV !== 'test') {
   console.log(`Connecting to MongoDB at ${MONGO_URI}...`);
+  // Global connection (safe for serverless caching)
   mongoose.connect(MONGO_URI)
-    .then(() => {
-      console.log('Successfully connected to MongoDB');
-      app.listen(PORT, () => {
-        console.log(`Examiq Backend running on http://localhost:${PORT}`);
-      });
-    })
+    .then(() => console.log('Successfully connected to MongoDB'))
     .catch((err) => {
       console.error('CRITICAL: MongoDB connection failed!');
       console.error(err);
     });
+
+  // Only start Express listener if NOT running in Vercel Serverless
+  if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+      console.log(`Examiq Backend running on http://localhost:${PORT}`);
+    });
+  }
 }
 
 export default app;
