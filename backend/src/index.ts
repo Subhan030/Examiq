@@ -9,7 +9,11 @@ import courseRoutes from './routes/courseRoutes';
 const app = express();
 
 // Standard Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -18,15 +22,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/courses', courseRoutes);
 
-// Root
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Examiq API is live ✅', version: '1.0.0' });
-});
-
 // Health Check
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ 
-    status: 'online', 
+  res.json({
+    status: 'online',
     timestamp: new Date().toISOString(),
     db_status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
