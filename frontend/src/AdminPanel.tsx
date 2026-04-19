@@ -29,7 +29,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, role, addToast, r
 
   const fetchCourses = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const resp = await fetch(`${API_URL}/api/courses`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -43,7 +43,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, role, addToast, r
 
   const fetchAllResults = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const resp = await fetch(`${API_URL}/api/exams/results/all`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -55,7 +55,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, role, addToast, r
 
   const handleGrade = async (resultId: string, questionId: string, scoreDelta: number) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const resp = await fetch(`${API_URL}/api/exams/results/${resultId}/grade`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -108,7 +108,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, role, addToast, r
       // Let's pass userId as a prop or decode token. For simplicity, we can fetch userId from local storage or decode token here.
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const resp = await fetch(`${API_URL}/api/courses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -149,7 +149,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, role, addToast, r
     });
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const resp = await fetch(`${API_URL}/api/exams`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -319,7 +319,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ token, role, addToast, r
                     btn.disabled = true;
                     
                     try {
-                      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+                      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
                       const resp = await fetch(`${API_URL}/api/exams/generate-questions`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

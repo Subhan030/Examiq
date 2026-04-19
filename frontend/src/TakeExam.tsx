@@ -68,7 +68,7 @@ export const TakeExam: React.FC<TakeExamProps> = ({ examId, token, userId, onClo
 
   const fetchExam = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const response = await fetch(`${API_URL}/api/exams/${examId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -103,7 +103,7 @@ export const TakeExam: React.FC<TakeExamProps> = ({ examId, token, userId, onClo
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const response = await fetch(`${API_URL}/api/exams/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

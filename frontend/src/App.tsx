@@ -57,7 +57,7 @@ function App() {
 
   const fetchDashboardData = async (token: string, u: UserData) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const response = await fetch(`${API_URL}/api/exams`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -65,7 +65,7 @@ function App() {
         setExams(await response.json());
       }
       if (u.role === 'Student' && u.id) {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+        const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
         const resResp = await fetch(`${API_URL}/api/exams/results/${u.id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -94,7 +94,7 @@ function App() {
     const body = isLogin ? { email, password } : { email, password, fullName, role };
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const response = await fetch(`${API_URL}/api/auth/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -125,7 +125,7 @@ function App() {
   const handleExamStateUpdate = async (examId: string, action: string) => {
     const token = localStorage.getItem('token');
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const res = await fetch(`${API_URL}/api/exams/${examId}/state`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -143,7 +143,7 @@ function App() {
   const fetchLeaderboard = async (examId: string, title: string) => {
     const token = localStorage.getItem('token');
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
       const res = await fetch(`${API_URL}/api/exams/${examId}/leaderboard`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
