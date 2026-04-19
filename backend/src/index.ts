@@ -18,6 +18,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/courses', courseRoutes);
 
+// Root
+app.get('/', (req: Request, res: Response) => {
+  res.json({ message: 'Examiq API is live ✅', version: '1.0.0' });
+});
+
 // Health Check
 app.get('/health', (req: Request, res: Response) => {
   res.json({ 
